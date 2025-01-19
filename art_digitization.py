@@ -8,6 +8,19 @@ from diffusers import StableDiffusionPipeline
 import torch
 import streamlit as st
 
+@st.cache_resource
+def load_pipeline():
+    pipeline = StableDiffusionPipeline.from_pretrained(
+        "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16
+    )
+    pipeline.to("cuda")
+    return pipeline
+
+def generate_image(prompt):
+    pipeline = load_pipeline()
+    image = pipeline(prompt).images[0]
+    return image
+
 @st.cache(allow_output_mutation=True)
 def load_model():
     return hub.load("https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2")
